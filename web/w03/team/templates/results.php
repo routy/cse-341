@@ -1,6 +1,6 @@
 <?php
 
-$name  = ( isset( $_POST['name'] ) ) ? filter_var( $_POST['name'], FILTER_SANITIZE_STRING ) : '';
+$name  = ( isset( $_POST['name'] ) )  ? filter_var( $_POST['name'], FILTER_SANITIZE_STRING ) : '';
 $email = ( isset( $_POST['email'] ) ) ? filter_var( $_POST['email'], FILTER_SANITIZE_EMAIL ) : '';
 $major = ( isset( $_POST['major'] ) && in_array( $_POST['major'], array_keys( $majors ) ) ) ? $majors[$_POST['major']] : '';
 $comments = ( isset( $_POST['comments'] ) ) ? filter_var( $_POST['comments'], FILTER_SANITIZE_STRING ) : '';
