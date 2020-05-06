@@ -3,7 +3,7 @@
 $name  = ( isset( $_POST['name'] ) ) ? filter_var( $_POST['name'], FILTER_SANITIZE_STRING ) : '';
 $email = ( isset( $_POST['email'] ) ) ? filter_var( $_POST['email'], FILTER_SANITIZE_EMAIL ) : '';
 $major = ( isset( $_POST['major'] ) && in_array( $_POST['major'], array_keys( $majors ) ) ) ? $majors[$_POST['major']] : '';
-$comments = ( isset( $_POST['name'] ) ) ? filter_var( $_POST['comments'], FILTER_SANITIZE_STRING ) : '';
+$comments = ( isset( $_POST['comments'] ) ) ? filter_var( $_POST['comments'], FILTER_SANITIZE_STRING ) : '';
 
 if ( isset( $_POST['continents'] ) && count( $_POST['continents'] ) > 0 ) {
     $matches = array_intersect_key( $continents, array_flip( $_POST['continents'] ) );
