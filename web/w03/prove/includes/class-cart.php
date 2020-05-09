@@ -22,6 +22,7 @@ class Cart {
 
     private function __construct() {
 
+        $this->_items_in_cart = [];
         $this->_session = Session::getInstance();
 
         // Populate the items in cart with the saved session
@@ -118,7 +119,10 @@ class Cart {
      * @return void
      */
     protected function retrieve_saved_cart() {
-        $this->_items_in_cart = $this->_session->get( 'cart' );
+        $items = $this->_session->get( 'cart' );
+        if ( $items ) {
+            $this->_items_in_cart = $items;
+        }
     }
 
     /**

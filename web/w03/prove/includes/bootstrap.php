@@ -5,8 +5,8 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 define('BOOTSTRAPPED', true);
-//define('BASE_PATH', '/w03/prove/'); // Production
-define('BASE_PATH', '/'); // Development
+define('BASE_PATH', '/w03/prove/'); // Production
+//define('BASE_PATH', '/'); // Development
 
 include_once( 'autoloader.php' );
 
