@@ -1,34 +1,14 @@
 <?php
 
-echo 'Database Connection Test.';
+require_once('includes/bootstrap.php');
 
-$uri = getenv('DATABASE_URL');
+echo 'Database Connection Test.<br/>';
 
-try {
-    
-    $db = parse_url( $uri );
+$db = Database::getInstance()->connection();
+$statement = $db->query( 'select * from users' );
 
-    $db = new PDO("pgsql:" . sprintf(
-        "host=%s;port=%s;user=%s;password=%s;dbname=%s;sslmode=require",
-        $db["host"],
-        $db["port"],
-        $db["user"],
-        $db["pass"],
-        ltrim($db["path"], "/")
-    ));
+$results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+print_r($results);
 
-    $query = "SELECT * FROM users";
 
-    $statement = $db->query( $query );
-
-    while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-        echo 'User: ' . $row['email'] . ' Password: ' . $row['password'] . '<br/>';
-    }
-
-} catch( PDOException $e ) {
-
-    echo $e->getMessage();
-
-}
