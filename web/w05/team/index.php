@@ -22,7 +22,10 @@ try {
     $query = "SELECT * FROM users";
 
     $statement = $db->query( $query );
-    $results   = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+        echo 'User: ' . $row['email'] . ' Password: ' . $row['password'] . '<br/>';
+    }
 
 } catch( PDOException $e ) {
 
