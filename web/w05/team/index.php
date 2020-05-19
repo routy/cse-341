@@ -1,5 +1,7 @@
 <?php
 
+echo 'Database Connection Test.';
+
 $uri = getenv('DATABASE_URL');
 
 try {
