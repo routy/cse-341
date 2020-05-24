@@ -12,7 +12,7 @@ $query = "SELECT l.id
           FROM locations as l
           WHERE l.status_id = ?";
 
-$params = [ self::STATUS_ACTIVE ];
+$params = [ Location::STATUS_ACTIVE ];
 
 if ( $searchText ) {
 
