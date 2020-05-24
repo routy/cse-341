@@ -18,7 +18,7 @@ class Database {
 
     private function __construct() {
 
-        $uri = getenv('DATABASE_URL');
+        $uri = getenv('HEROKU_POSTGRESQL_BROWN_URL');
 
         try {
             

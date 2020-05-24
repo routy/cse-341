@@ -5,9 +5,9 @@ VALUES ('Nick', 'Routsong', 'routy@byui.edu', '$2y$10$lvNbDwhYYSMRDRMm41uCte2URV
 INSERT INTO statuses (name) VALUES ('Pending'),('Active'),('Completed'),('Canceled');
 
 INSERT INTO locations (name, address1, address2, city, state, zip, phone, status_id) VALUES
-('The UPS Store 3950', '9221 E Baseline Rd.', 'Suite 109', 'Mesa', 'AZ', '85209', '4803800700', 1),
-('Hobby Lobby', '10656 E Southern Ave.', null, 'Mesa', 'AZ', '85209', '4803801509', 1),
-('Taco Bell', '9315 E Baseline Rd.', null, 'Mesa', 'AZ', '85209', '4803800700', 1);
+('The UPS Store 3950', '9221 E Baseline Rd.', 'Suite 109', 'Mesa', 'AZ', '85209', '4803800700', 2),
+('Hobby Lobby', '10656 E Southern Ave.', null, 'Mesa', 'AZ', '85209', '4803801509', 2),
+('Taco Bell', '9315 E Baseline Rd.', null, 'Mesa', 'AZ', '85209', '4803800700', 2);
 
 INSERT INTO location_user (location_id, user_id) VALUES
 (1, 1), (2, 1), (3, 1);
