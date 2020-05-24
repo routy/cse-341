@@ -25,7 +25,8 @@ echo '<pre>';
 print_r($params);
 
 $db = Database::getInstance()->connection();
-$statement = $db->prepare($query)->execute($params);
+$statement  = $db->prepare($query);
+$result     = $statement->execute($params);
 $locations  = $statement->fetchAll(PDO::FETCH_COLUMN);
 
 var_dump($locations);
