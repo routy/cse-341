@@ -15,7 +15,7 @@ $query = "SELECT l.id
 $params = [ Location::STATUS_ACTIVE ];
 
 if ( $searchText ) {
-    $query .= ' AND LOWER(l.name) LIKE "?"';
+    $query .= ' AND LOWER(l.name) LIKE ?';
     $params[] = '%'. strtolower( filter_var($_GET['search'], FILTER_SANITIZE_STRING) ) . '%';
 }
 
