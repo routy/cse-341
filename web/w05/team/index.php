@@ -4,23 +4,28 @@ require_once('includes/bootstrap.php');
 
 $db = Database::getInstance()->connection();
 
-$query = 'SELECT * FROM Scriptures WHERE 1';
+$query  = 'SELECT * FROM Scriptures WHERE true';
+$params = [];
 
 if (isset($_GET['book']) && !empty($_GET['book'])) {
-    $query  .= ' AND `book` LIKE ?';
+    $query  .= ' AND book = ?';
     $params[] = filter_var( $_GET['book'], FILTER_SANITIZE_STRING);
 }
 if (isset($_GET['chapter']) && !empty($_GET['chapter'])) {
-    $query  .= ' AND `chapter` LIKE ?';
+    $query  .= ' AND chapter = ?';
     $params[] = filter_var( $_GET['chapter'], FILTER_SANITIZE_STRING);
 }
 if (isset($_GET['verse']) && !empty($_GET['verse'])) {
-    $query  .= ' AND `verse` LIKE ?';
+    $query  .= ' AND verse = ?';
     $params[] = filter_var( $_GET['verse'], FILTER_SANITIZE_STRING);
 }
 if (isset($_GET['content']) && !empty($_GET['content'])) {
-    $query  .= ' AND `content` LIKE ?';
+    $query  .= ' AND content = ?';
     $params[] = filter_var( $_GET['content'], FILTER_SANITIZE_STRING);
+}
+if (isset($_GET['id']) && !empty($_GET['id'])) {
+    $query  .= ' AND id = ?';
+    $params[] = filter_var( $_GET['id'], FILTER_SANITIZE_STRING);
 }
 
 $statement = $db->prepare( $query );
@@ -65,6 +70,7 @@ $results = $statement->fetchAll(PDO::FETCH_ASSOC);
 
     </head>
 
+    <?php if(!isset($_GET['id']) || count($results) === 0) : ?>
     <form>
         <p>
             <label for="inputBook">Book</label>
@@ -84,14 +90,38 @@ $results = $statement->fetchAll(PDO::FETCH_ASSOC);
         </p>
         <button type="submit">Submit</button>
     </form>
+    <?php endif; ?>
 
-    <ul>
-        <?php foreach($results as $result) : ?>
-        <li>
-            <?php echo '<strong>' . $result['book'] . ' ' . $result['chapter'] . ':' . $result['verse'] . '</strong> - "' . $result['content'] . '"'; ?>
-        </li>
-        <?php endforeach; ?>
-    </ul>
+    <?php if(isset($_GET['id']) && count($results) > 0) : ?>
+
+        <?php $result = current($results); ?>
+
+        <?php echo '<strong>' . $result['book'] . ' ' . $result['chapter'] . ':' . $result['verse'] . '</strong> - "' . $result['content'] . '"'; ?>
+
+    <?php elseif ( $results && count($results) > 0 ) : ?>
+
+        <ul>
+            <?php 
+            
+            if ( $results && count($results) > 0 ) :
+
+                foreach($results as $result) : ?>
+
+                <li>
+                    <?php echo '<a href="?id=' . $result['id'] . '"><strong>' . $result['book'] . ' ' . $result['chapter'] . ':' . $result['verse'] . '</strong>'; ?></a>
+                </li>
+
+                <?php 
+                
+                endforeach; 
+
+            endif;
+            
+            ?>
+        </ul>
+
+    <?php endif; ?>
+
 
 </body>
 </html>

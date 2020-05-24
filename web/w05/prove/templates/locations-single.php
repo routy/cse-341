@@ -1,11 +1,22 @@
 <?php
 
 $location_id = (int) $_GET['location_id'];
-$location = new Location( $location_id );
+
+try {
+    $location = new Location( $location_id );
+} catch ( Exception $e) {
+
+    $messages = $session->get('messages');
+    $messages[] = [
+        'message' => 'The location you requested was not found.',
+        'type' => 'error'
+    ];
+    $session->store('messages', $messages);
+
+    redirect('index.php');
+}
 
 ?>
-
-
 
 <main role="main">
 

@@ -6,7 +6,6 @@ if ( isset($_GET['search']) && !empty($_GET['search']) ) {
     $searchText = filter_var($_GET['search'], FILTER_SANITIZE_STRING);
 }
 
-/*
 $db = Database::getInstance()->connection();
 
 $query = "SELECT l.id
@@ -23,9 +22,7 @@ if ( $searchText ) {
 
 $db = Database::getInstance()->connection();
 $statement = $db->prepare($query, $params);
-$locations  = $statement->fetchAll(PDO::FETCH_ASSOC);
-*/
-$locations = [1, 2, 3];
+$locations  = $statement->fetchAll(PDO::FETCH_COLUMN);
 
 ?>
 

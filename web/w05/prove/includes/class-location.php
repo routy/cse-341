@@ -51,9 +51,9 @@ class Location {
     public $phone;
 
     /**
-     * @var $status_id int
+     * @var $statusId int
      */
-    public $status_id;
+    public $statusId;
 
     /**
      * @var $queueId
@@ -62,36 +62,19 @@ class Location {
 
     public function __construct( int $id ) {
 
-        /*
-        $db = Database::getInstance()->connection();
-
         $query = "SELECT l.*, 
                          q.id as queue_id
                   FROM locations as l
                   LEFT JOIN queues as q 
                     ON (l.id = q.location_id AND q.status_id = ?)
-                  WHERE l.id = ?";
+                  WHERE l.id = ?
+                  LIMIT 1";
 
         $params = [ self::STATUS_ACTIVE, $id ];
 
         $db = Database::getInstance()->connection();
         $statement = $db->prepare($query, $params);
         $location  = $statement->fetch(PDO::FETCH_ASSOC);
-        */
-
-        // Retrieve location from the database
-        $location = [
-            'id' => $id,
-            'name' => 'UPS Store ' . $id,
-            'address1' => '123 Testing Drive',
-            'address2' => 'Suite 456',
-            'city' => 'Mesa',
-            'state' => 'AZ',
-            'zip' => '85209',
-            'phone' => '4805553333',
-            'status_id' => 1,
-            'queue_id' => 1
-        ];
         
         if(!$location) {
             throw new Exception('Location was not found with ID: ' . $id);
@@ -119,11 +102,11 @@ class Location {
 
     /**
      * Retrieve the total count of queue items by status
+     * @param int $statusId
+     * @return int
      */
-    public function getQueueItemCountByStatus( int $status_id = 1 ) {
+    public function getQueueItemCountByStatus( int $statusId = 1 ) {
 
-        return 5;
-        
         if ($this->hasActiveQueue() === false) {
             return false;
         }
@@ -133,13 +116,12 @@ class Location {
                   FROM queue_items as qi 
                   WHERE queue_id = ? AND qi.status_id = ?";
 
-        $params = [ $this->queueId, $status_id ];
+        $params = [ $this->queueId, $statusId ];
 
         $db = Database::getInstance()->connection();
         $statement = $db->prepare($query, $params);
-        $items = $statement->fetchColumn();
 
-        return $items;
+        return $statement->fetchColumn();
 
     }
 
@@ -148,8 +130,6 @@ class Location {
      */
     public function getCurrentQueuePosition() {
 
-        return 5;
-        
         if ($this->hasActiveQueue() === false) {
             return false;
         }
@@ -179,7 +159,7 @@ class Location {
         }
 
         // Query the database to retrieve the current position of the queue counter
-        $query = "SELECT qi.position
+        $query = "SELECT qi.queue_position
                   FROM queue_items as qi
                   INNER JOIN queues as q
                     ON (q.id = qi.queue_id AND q.location_id = ?)
@@ -206,10 +186,10 @@ class Location {
 
         // Insert a new record into the queue table
         $query = 'INSERT INTO queue_items 
-                  (queue_id, position, status_id, token)
-                  (SELECT queue_id, COUNT(id), queue_id, ? FROM queue_items WHERE  )';
+                  (queue_id, queue_position, status_id, token)
+                  (SELECT queue_id, COUNT(id), ?, ? FROM queue_items WHERE queue_id = ? AND status_id = ?)';
 
-        $params = [$this->queueId, self::STATUS_PENDING, $token];
+        $params = [ self::STATUS_PENDING, $token, $this->queueId, self::STATUS_PENDING ];
 
         $db = Database::getInstance()->connection();
         $statement = $db->prepare($query, $params);
@@ -232,7 +212,7 @@ class Location {
 
             $db->beginTransaction();
 
-            $query = 'UPDATE queue_items SET position = position - 1
+            $query = 'UPDATE queue_items SET queue_position = queue_position - 1
                     WHERE status_id = ? AND queue_id = ?';
 
             $params = [self::STATUS_PENDING, $this->queueId];
@@ -302,7 +282,7 @@ class Location {
             if ( $result ) {
 
                 // Update all queue items after it to reduce their queue position by 1
-                $query = 'UPDATE queue_items SET position = position - 1
+                $query = 'UPDATE queue_items SET queue_position = queue_position - 1
                         WHERE status_id = ? AND queue_id = ? AND id > ?';
 
                 $params = [self::STATUS_PENDING, $this->queueId, $itemId];
