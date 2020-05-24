@@ -73,7 +73,8 @@ class Location {
         $params = [ self::STATUS_ACTIVE, $id ];
 
         $db = Database::getInstance()->connection();
-        $statement = $db->prepare($query, $params);
+        $statement = $db->prepare($query);
+        $result    = $statement->execute($params);
         $location  = $statement->fetch(PDO::FETCH_ASSOC);
         
         if(!$location) {
@@ -119,9 +120,14 @@ class Location {
         $params = [ $this->queueId, $statusId ];
 
         $db = Database::getInstance()->connection();
-        $statement = $db->prepare($query, $params);
+        $statement = $db->prepare($query)->execute($params);
 
-        return $statement->fetchColumn();
+        $db = Database::getInstance()->connection();
+        $statement = $db->prepare($query);
+        $result    = $statement->execute($params);
+        $position  = $statement->fetch(PDO::FETCH_COLUMN);
+
+        return $position;
 
     }
 
@@ -142,8 +148,9 @@ class Location {
         $params = [ $this->queueId, self::STATUS_ACTIVE, self::STATUS_COMPLETED ];
 
         $db = Database::getInstance()->connection();
-        $statement = $db->prepare($query, $params);
-        $position = $statement->fetchColumn();
+        $statement = $db->prepare($query);
+        $result    = $statement->execute($params);
+        $position  = $statement->fetch(PDO::FETCH_COLUMN);
 
         return ($position > 0) ? $position : 1;
 
@@ -168,8 +175,9 @@ class Location {
         $params = [ $this->id, $token ];
 
         $db = Database::getInstance()->connection();
-        $statement = $db->prepare($query, $params);
-        $position = $statement->fetchColumn();  
+        $statement = $db->prepare($query);
+        $result    = $statement->execute($params);
+        $position  = $statement->fetch(PDO::FETCH_COLUMN);
 
         return is_numeric($position) ? $position : false;
 
@@ -192,8 +200,8 @@ class Location {
         $params = [ self::STATUS_PENDING, $token, $this->queueId, self::STATUS_PENDING ];
 
         $db = Database::getInstance()->connection();
-        $statement = $db->prepare($query, $params);
-        $result = $statement->execute();
+        $statement = $db->prepare($query);
+        $result    = $statement->execute($params);
 
         return ($result) ? $token : false;
     }
@@ -217,16 +225,16 @@ class Location {
 
             $params = [self::STATUS_PENDING, $this->queueId];
 
-            $statement = $db->prepare($query, $params);
-            $statement->execute();
+            $statement = $db->prepare($query);
+            $result    = $statement->execute($params);
 
             $query = 'UPDATE queue_items SET status_id = ?
                     WHERE status_id = ? AND queue_id = ?';
 
             $params = [self::STATUS_COMPLETED, self::STATUS_ACTIVE, $this->queueId];
 
-            $statement = $db->prepare($query, $params);
-            $statement->execute();
+            $statement = $db->prepare($query);
+            $result    = $statement->execute($params);
 
             $query = 'UPDATE queue_items SET status_id = ?
                     WHERE id = (
@@ -239,8 +247,8 @@ class Location {
 
             $params = [self::STATUS_ACTIVE, $this->queueId, self::STATUS_PENDING];
 
-            $statement = $db->prepare($query, $params);
-            $statement->execute();
+            $statement = $db->prepare($query);
+            $result    = $statement->execute($params);
 
             $db->commit();
 
@@ -264,9 +272,12 @@ class Location {
 
         $db = Database::getInstance()->connection();
 
-        $query = "SELECT id FROM queue_items WHERE token = ? AND status_id = ?";
-        $statement = $db->prepare($query, [ $token, self::STATUS_PENDING ]);
-        $itemId = $statement->fetchColumn();
+        $query  = "SELECT id FROM queue_items WHERE token = ? AND status_id = ?";
+        $params = [ $token, self::STATUS_PENDING ];
+
+        $statement = $db->prepare($query);
+        $result    = $statement->execute($params);
+        $itemId    = $statement->fetch(PDO::FETCH_COLUMN);
 
         if ($itemId) {
             // Cancel the queue item
@@ -276,8 +287,8 @@ class Location {
 
             $params = [self::STATUS_CANCELED, self::STATUS_PENDING, $itemId];
 
-            $statement = $db->prepare($query, $params);
-            $result = $statement->execute();
+            $statement = $db->prepare($query);
+            $result    = $statement->execute($params);
 
             if ( $result ) {
 
@@ -287,8 +298,8 @@ class Location {
 
                 $params = [self::STATUS_PENDING, $this->queueId, $itemId];
 
-                $statement = $db->prepare($query, $params);
-                $statement->execute();
+                $statement = $db->prepare($query);
+                $result    = $statement->execute($params);
 
             }
 
