@@ -19,17 +19,10 @@ if ( $searchText ) {
     $params[] = '%'. strtolower( filter_var($_GET['search'], FILTER_SANITIZE_STRING) ) . '%';
 }
 
-echo $query;
-echo '<pre>';
-print_r($params);
-
 $db = Database::getInstance()->connection();
 $statement  = $db->prepare($query);
 $result     = $statement->execute($params);
 $locations  = $statement->fetchAll(PDO::FETCH_COLUMN);
-
-var_dump($locations);
-echo '</pre>';
 
 ?>
 
