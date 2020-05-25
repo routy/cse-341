@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 define('BOOTSTRAPPED', true);
 
-if(getenv('BASE_PATH')) {
+if(!getenv('BASE_PATH')) {
     define('BASE_PATH', '/w05/prove/'); 
 } else {
     define('BASE_PATH', getenv('BASE_PATH')); 
