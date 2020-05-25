@@ -20,6 +20,9 @@ class Database {
 
         $uri = getenv('HEROKU_POSTGRESQL_BROWN_URL');
 
+        echo $uri;
+        exit;
+
         try {
             
             $db = parse_url( $uri );
