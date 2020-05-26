@@ -8,4 +8,24 @@ require_once('templates/admin-header.php'); ?>
     <h1 class="h2">Locations</h1>
 </div>
 
+<?php 
+
+$db = Database::getInstance()->connection();
+
+$query  = "SELECT l.* 
+           FROM locations as l
+           INNER JOIN location_user lu 
+            ON (l.id = lu.location_id AND lu.user_id = ?)";
+
+$params     = [ getLoggedInUserId() ];
+$statement  = $db->prepare($query);
+$result     = $statement->execute($params);
+$locations  = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+echo '<pre>';
+print_r($locations);
+echo '</pre>';
+
+?>
+
 <?php require_once('templates/admin-footer.php'); ?>
