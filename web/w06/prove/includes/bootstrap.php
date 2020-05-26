@@ -14,23 +14,33 @@ if(!getenv('BASE_PATH')) {
 
 include_once( 'autoloader.php' );
 
-function path( $path ) {
-    return BASE_PATH . $path;
-}
-
-function redirect( $path ) {
-    header('Location: ' . path( $path ));
-    exit;
-}
-
 if (isset($_REQUEST['action']) && !empty($_REQUEST['action']) ) {
 
     $session = Session::getInstance();
 
     switch ($_REQUEST['action']){
 
+        case 'login':
 
-        case 'add_user_to_queue':
+        break;
+
+        case 'logout':
+
+        break;
+
+        case 'register':
+
+        break;
+
+        case 'next_in_queue':
+
+        break;
+
+        case 'cancel_item_in_queue':
+
+        break;
+
+        case 'add_item_to_queue':
 
             if ( isset( $_REQUEST['location_id'] ) && is_numeric( $_REQUEST['location_id'] ) ) {
 
@@ -83,11 +93,6 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']) ) {
                     redirect('index.php' );
 
                 }
-
-
-
-
-                
             }
 
             redirect('index.php');
@@ -100,6 +105,53 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']) ) {
 
     }
 
+}
+
+function isLoggedIn() {
+    $session = Session::getInstance();
+    return $session->has('userId');
+}
+
+function getLoggedInUserId() {
+    $session = Session::getInstance();
+    return $session->get('userId');
+}
+
+function getUser() {
+    
+    if ( isLoggedIn() ) {
+        $userId = getLoggedInUserId();
+
+        $database = Database::getInstance();
+        $query = "SELECT u.*
+                  FROM users as u
+                  WHERE u.id = ?
+                  LIMIT 1";
+
+        $params = [ $userId ];
+
+        $db = Database::getInstance()->connection();
+        $statement = $db->prepare($query);
+        $result    = $statement->execute($params);
+        $user      = $statement->fetch(PDO::FETCH_ASSOC);
+
+        return $user;
+    } 
+
+    return false;
+}
+
+function isCurrentPage( $page ) {
+    return (isset($_SERVER['REQUEST_URI']) && '/' . $page === $_SERVER['REQUEST_URI']);
+}
+
+function path( $path ) {
+    return BASE_PATH . $path;
+}
+
+function redirect( $path ) {
+    header('Location: ' . path( $path ));
+    exit;
 }
 
 

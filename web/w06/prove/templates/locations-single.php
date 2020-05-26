@@ -25,7 +25,7 @@ try {
       <h1 class="display-3">Welcome to <?php echo $location->name; ?></h1>
       <p>We're all about making life easier for our customers. In an effort to do just that, we've created a digital line for you to wait in. We don't want you out in the summer heat! When your number comes up, simply enter the store and we're ready to service your needs.</p>
       <p>
-        <a href="<?php echo path('?location_id=' . $location->id . '&action=add_user_to_queue'); ?>" class="btn btn-lg btn-primary">
+        <a href="<?php echo path('?location_id=' . $location->id . '&action=add_item_to_queue'); ?>" class="btn btn-lg btn-primary">
             Enter Queue &raquo;
         </a>
       </p>
