@@ -3,6 +3,8 @@
 $session  = Session::getInstance();
 $messages = $session->get('messages');
 
+$user = getUser();
+
 ?>
 
 <!doctype html>
@@ -19,7 +21,7 @@ $messages = $session->get('messages');
 
     <link rel="stylesheet" href="css/styles.css"/>
 
-    <title>Week 05 - Prove Activity</title>
+    <title>QueueMe - Locations</title>
 
 </head>
 
@@ -32,8 +34,12 @@ $messages = $session->get('messages');
         </a>
     </h5>
     <nav class="my-2 my-md-0 mr-md-3">
-        <a class="p-2 text-dark" href="<?php echo path('index.php'); ?>">View Locations</a>
-        <a class="p-2 text-dark" href="<?php echo path('login.php'); ?>">Business Login</a>
+        <?php if ( !$user ) : ?>
+            <a class="p-2 text-dark" href="<?php echo path('login.php'); ?>">Business Login</a>
+        <?php else : ?>
+            <a class="p-2 text-dark" href="<?php echo path('admin.php'); ?>">Dashboard</a>
+            <a class="p-2 text-dark" href="<?php echo path('login.php?logout'); ?>">Logout</a>
+        <?php endif; ?>    
     </nav>
 </div>
 

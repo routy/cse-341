@@ -12,7 +12,7 @@ require_once('templates/admin-header.php'); ?>
 
 $db = Database::getInstance()->connection();
 
-$query  = "SELECT l.* 
+$query  = "SELECT l.id 
            FROM locations as l
            INNER JOIN location_user lu 
             ON (l.id = lu.location_id AND lu.user_id = ?)";
@@ -22,10 +22,49 @@ $statement  = $db->prepare($query);
 $result     = $statement->execute($params);
 $locations  = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-echo '<pre>';
-print_r($locations);
-echo '</pre>';
+if( $locations && count($locations) > 0 ) : ?>
 
-?>
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+            <th scope="col">Location Status</th>
+            <th scope="col">Name</th>
+            <th scope="col">Address</th> 
+            <th scope="col">Queue Status</th>
+            <th scope="col">In Queue</th>
+            <th scope="col">Est. Wait Time</th>
+            <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+
+        <?php foreach( $locations as $l ) : ?>
+
+            <?php
+
+            $location = new Location( $l['id'] );
+
+            ?>
+
+            <tr>
+            <th scope="row"><?php echo $location->getFormattedStatus(); ?></th>
+            <td><?php echo $location->name; ?></td>
+            <td><?php echo $location->getFormattedAddress(); ?></td>
+            <th><?php echo $location->getFormattedStatus(); ?></th>
+            <td><?php echo $location->getQueueItemCountByStatus(); ?></td>
+            <td><?php echo $location->getEstimatedWaitTime( $format = 'minutes' ); ?> mins</td>
+            <td><a href="<?php echo path('index.php?location_id=' . $location->id) ?>" class="btn btn-sm btn-outline-primary">View Location</a></td>
+            </tr>
+            
+        <?php endforeach; ?>
+        
+        </tbody>
+    </table>
+
+<?php else : ?>
+
+    <p>You don't currently manage any locations.</p>
+
+<?php endif; ?>
 
 <?php require_once('templates/admin-footer.php'); ?>

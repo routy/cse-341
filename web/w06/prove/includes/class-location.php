@@ -94,6 +94,37 @@ class Location {
 
     }
 
+    public function getFormattedAddress() {
+        $address[] = $this->address1;
+        if ( $this->address2 ) {
+            $address[] = $this->address2;
+        }
+        $address[] = $this->city . ', ' . $this->state . ' ' . $this->zip;
+        return implode('<br>', $address);
+    }
+
+    public function getFormattedStatus()
+    {
+        switch ( $this->statusId ) {
+            case self::STATUS_ACTIVE:
+                $status = 'Active'; 
+            break;
+            case self::STATUS_PENDING:
+                $status = 'Pending'; 
+            break;
+            case self::STATUS_COMPLETED:
+                $status = 'Completed'; 
+            break;
+            case self::STATUS_CANCELED:
+                $status = 'Canceled'; 
+            break;
+            default:
+                $status = 'Unknown';
+        }
+
+        return $status;
+    }
+
     /**
      * Does the location have an active queue
      */
@@ -106,7 +137,7 @@ class Location {
      * @param int $statusId
      * @return int
      */
-    public function getQueueItemCountByStatus( int $statusId = 1 ) {
+    public function getQueueItemCountByStatus( int $statusId = self::STATUS_PENDING ) {
 
         if ($this->hasActiveQueue() === false) {
             return false;
@@ -265,6 +296,23 @@ class Location {
     }
 
     /**
+     * Check if a user is allowed to admin the current location.
+     */
+    public function isUserLocationAdmin( $userId ) {
+
+        $db = Database::getInstance()->connection();
+
+        $query  = "SELECT * FROM location_user WHERE location_id = ? AND user_id = ?";
+        $params = [$this->id, $userId];
+
+        $statement = $db->prepare($query);
+        $result    = $statement->execute($params);
+
+        return ($statement->fetch(PDO::FETCH_ASSOC)) ? true : false;
+    }
+
+
+    /**
      * For all the items that are after the canceled item, we will want to reduce their
      * position in the queue.
      */
@@ -311,12 +359,21 @@ class Location {
 
     }
 
-    public function getEstimatedWaitTime()
+    public function getEstimatedWaitTime( $format = 'seconds' )
     {
         // Hard coding 2.5 minutes
         $averageWaitTimePerQueueItem = 2.5 * 60; // Avg. number of seconds per queue item
 
-        return $this->getQueueItemCountByStatus() * $averageWaitTimePerQueueItem;
+        $time = $this->getQueueItemCountByStatus() * $averageWaitTimePerQueueItem;
+
+        if ( $format === 'minutes' ) {
+            if ( $time > 0 ) {
+                $time = $time / 60;
+            }
+        }
+
+        return $time;
+
     }
 
 }
