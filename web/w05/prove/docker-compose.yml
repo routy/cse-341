@@ -6,7 +6,7 @@ services:
       context: '.'
       dockerfile: 'dockerfile'
       labels:
-        - "apps.cse-341-w05-prove.type=PHP"
+        - "apps.cse-341-w06-prove.type=PHP"
     working_dir: '/var/www/html'
     env_file:
       - '.env'

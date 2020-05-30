@@ -151,14 +151,11 @@ class Location {
         $params = [ $this->queueId, $statusId ];
 
         $db = Database::getInstance()->connection();
-        $statement = $db->prepare($query)->execute($params);
-
-        $db = Database::getInstance()->connection();
         $statement = $db->prepare($query);
         $result    = $statement->execute($params);
-        $position  = $statement->fetch(PDO::FETCH_COLUMN);
+        $items     = $statement->fetch(PDO::FETCH_COLUMN);
 
-        return $position;
+        return $items;
 
     }
 
@@ -223,17 +220,23 @@ class Location {
     {
         $token = uniqid('qm-', true);
 
-        // Insert a new record into the queue table
-        $query = 'INSERT INTO queue_items 
-                  (queue_id, queue_position, status_id, token)
-                  (SELECT queue_id, COUNT(id), ?, ? FROM queue_items WHERE queue_id = ? AND status_id = ?)';
-
-        $params = [ self::STATUS_PENDING, $token, $this->queueId, self::STATUS_PENDING ];
-
         $db = Database::getInstance()->connection();
+        $db->beginTransaction();
+        $db->exec('LOCK TABLE queue_items IN ACCESS EXCLUSIVE MODE');
+        
+        $query     = "SELECT COUNT(id) FROM queue_items WHERE queue_id = ? AND status_id = ? GROUP BY queue_id";
+        $params    = [ $this->queueId, self::STATUS_PENDING ];
+        $statement = $db->prepare($query);
+        $statement->execute($params);
+        $position  = $statement->fetchColumn();
+
+        $query     = 'INSERT INTO queue_items (queue_id, queue_position, status_id, token) VALUES(?, ?, ?, ?)';
+        $params    = [ $this->queueId, ($position) ? $position : 1, self::STATUS_PENDING, $token];
         $statement = $db->prepare($query);
         $result    = $statement->execute($params);
 
+        $db->commit();
+ 
         return ($result) ? $token : false;
     }
 
@@ -260,7 +263,7 @@ class Location {
             $result    = $statement->execute($params);
 
             $query = 'UPDATE queue_items SET status_id = ?
-                    WHERE status_id = ? AND queue_id = ?';
+                      WHERE status_id = ? AND queue_id = ?';
 
             $params = [self::STATUS_COMPLETED, self::STATUS_ACTIVE, $this->queueId];
 
@@ -359,12 +362,13 @@ class Location {
 
     }
 
-    public function getEstimatedWaitTime( $format = 'seconds' )
+    public function getEstimatedWaitTime( $format = 'seconds', $token = null )
     {
         // Hard coding 2.5 minutes
         $averageWaitTimePerQueueItem = 2.5 * 60; // Avg. number of seconds per queue item
-
-        $time = $this->getQueueItemCountByStatus() * $averageWaitTimePerQueueItem;
+        $position = ($token) ? $this->getCurrentQueuePositionByToken($token) : $this->getQueueItemCountByStatus();
+        
+        $time = $position * $averageWaitTimePerQueueItem;
 
         if ( $format === 'minutes' ) {
             if ( $time > 0 ) {

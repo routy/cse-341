@@ -48,15 +48,12 @@ $locations  = $statement->fetchAll(PDO::FETCH_COLUMN);
         ?>
             <div class="card mb-4 shadow-sm">
                 <div class="card-header">
-                    <h4 class="my-0 font-weight-normal"><?php echo $location->name; ?></h4>
+                    <h4 class="my-0 font-weight-normal location-name"><?php echo $location->name; ?></h4>
                 </div>
                 <div class="card-body">
-                    <h1 class="card-title pricing-card-title"></h1>
                         
-                    <div>
-                        <p><?php echo $location->address1; ?></p>
-                        <p><?php echo $location->address2; ?></p>
-                        <p><?php echo $location->city . ', ' . $location->state . ' ' . $location->zip; ?></p>
+                    <div class="location-address">
+                        <?php echo $location->getFormattedAddress(); ?>
                     </div>
 
                     <a href="<?php echo path('?location_id=' . $location->id); ?>"

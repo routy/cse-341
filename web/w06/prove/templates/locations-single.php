@@ -16,11 +16,18 @@ try {
     redirect('index.php');
 }
 
-$user = getUser();
-$isAdmin = false;
+$user     = getUser();
+$isAdmin  = false;
+$position = false;
 
 if ( $user ) {
-  $isAdmin = $location->isUserLocationAdmin($user['id']);
+  $isAdmin  = $location->isUserLocationAdmin($user['id']);
+}
+
+$token = $session->get( $location->id . '_token');
+
+if ( $token ) {
+  $position = $location->getCurrentQueuePositionByToken($token); 
 }
 
 ?>
@@ -34,11 +41,11 @@ if ( $user ) {
       
       <?php if ($isAdmin) : ?>
         <p>
-        <a href="<?php echo path('?location_id=' . $location->id . '&action=progress_queue'); ?>" class="btn btn-lg btn-primary">
+        <a href="<?php echo path('?location_id=' . $location->id . '&action=next_in_queue'); ?>" class="btn btn-lg btn-primary">
             Serve Next In Queue &raquo;
         </a>
       </p>
-      <?php else : ?>
+      <?php elseif ( !$position ) : ?>
       <p>
         <a href="<?php echo path('?location_id=' . $location->id . '&action=add_item_to_queue'); ?>" class="btn btn-lg btn-primary">
             Enter Queue &raquo;
@@ -53,24 +60,26 @@ if ( $user ) {
     <!-- Example row of columns -->
     <div class="row">
       <div class="col-md-4">
-        <h2>Address</h2>
-        <p><?php echo $location->address1; ?></p>
-        <p><?php echo $location->address2; ?></p>
-        <p><?php echo $location->city . ', ' . $location->state . ' ' . $location->zip; ?></p>
+        <h3>Address</h3>
+        <?php echo $location->getFormattedAddress(); ?>
       </div>
       <div class="col-md-4">
-        <h2>Currently Waiting</h2>
-        <p><?php echo $location->getCurrentQueuePosition(); ?></p>
+        <h3>Total Waiting</h3>
+        <p><?php echo $location->getQueueItemCountByStatus(); ?></p>
       </div>
       <div class="col-md-4">
-        <h2>Est. Wait Time</h2>
+        <h3>Est. Wait Time</h3>
         <p><?php 
 
-        $waitTime = $location->getEstimatedWaitTime( 'minutes' );
+        $waitTime = $location->getEstimatedWaitTime( 'minutes', ($token) ? $token : null );
 
         echo $waitTime . ' minutes'; 
         
         ?></p>
+        <?php if ( $position ) : ?>
+          <h3>Your Position</h3>
+          <p><?php echo $position; ?></p>
+        <?php endif; ?>
       </div>
     </div>
 
