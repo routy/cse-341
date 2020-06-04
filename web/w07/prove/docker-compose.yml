@@ -1,0 +1,16 @@
+version: '3.6'
+  
+services:
+  app:
+    build:
+      context: '.'
+      dockerfile: 'dockerfile'
+      labels:
+        - "apps.cse-341-w07-prove.type=PHP"
+    working_dir: '/var/www/html'
+    env_file:
+      - '.env'
+    volumes:
+      - '.:/var/www/html'
+    ports: 
+      - "8181:80"
