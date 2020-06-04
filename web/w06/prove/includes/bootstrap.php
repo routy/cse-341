@@ -20,11 +20,16 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']) ) {
 
     switch ($_REQUEST['action']){
 
-        case 'progress_queue':
+        case 'cancel_item_in_queue':
 
-            $userId = getLoggedInUserId();
+        break;
 
-            // Check if the user is allowed to progress the queue
+        case 'next_in_queue':
+
+            if (!isLoggedIn()) {
+                redirect('index.php');
+            }
+
             if ( isset( $_REQUEST['location_id'] ) && is_numeric( $_REQUEST['location_id'] ) ) {
 
                 $locationId = $_REQUEST['location_id'];
@@ -34,33 +39,57 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']) ) {
                 try {
 
                     $location = new Location( $locationId );
-                    
-                    if ( $location->isUserLocationAdmin($userId) ) {
+                
+                }  catch( Exception $e ) {
 
-                        $location->setNextInQueueActive();
-
-                        $messages[] = [
-                            'message' => 'Queue has advanced to the next user.',
-                            'type' => 'success'
-                        ];
-                        $session->store('messages', $messages);
-
-                    }
-
-                } catch (Exception $e) {
-
+                    $messages = $session->get('messages');
                     $messages[] = [
-                        'message' => 'You are not allowed to progress the queue for this location.',
+                        'message' => 'We were unable to find the location you specified.',
                         'type' => 'danger'
                     ];
                     $session->store('messages', $messages);
 
+                    redirect('index.php' );
+
+                }
+
+                try {
+
+                    $result = $location->setNextInQueueActive();
+
+                    if ( $result ) {
+                        $messages[] = [
+                            'message' => 'Queue has been advanced successfully.',
+                            'type' => 'success'
+                        ];
+                        $session->store('messages', $messages);
+                    } else {
+                        $messages[] = [
+                            'message' => 'We were unable to advance the queue.',
+                            'type' => 'danger'
+                        ];
+                        $session->store('messages', $messages);
+                    }
+
+                    redirect('index.php?location_id=' . $location->id );
+
+                } catch( Exception $e ) {
+
+                    $messages = $session->get('messages');
+                    $messages[] = [
+                        'message' => 'We were unable to progress the queue. An error has occurred.',
+                        'type' => 'danger'
+                    ];
+                    $session->store('messages', $messages);
+
+                    redirect('index.php' );
+
                 }
             }
 
-        break;
-
-        case 'cancel_item_in_queue':
+            redirect('index.php');
+            
+            break;
 
         break;
 
@@ -75,14 +104,29 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']) ) {
                 try {
 
                     $location = new Location( $locationId );
+                
+                }  catch( Exception $e ) {
+
+                    $messages = $session->get('messages');
+                    $messages[] = [
+                        'message' => 'We were unable to find the location you specified.',
+                        'type' => 'danger'
+                    ];
+                    $session->store('messages', $messages);
+
+                    redirect('index.php' );
+
+                }
+
+                try {
 
                     // Store the user's token into their session
-                    if (!$session->has($locationId .'_token')) {
+                    if (!$session->has($location->id .'_token')) {
 
                         $token    = $location->addNewQueueItem();
                         $position = $location->getCurrentQueuePositionByToken($token);
 
-                        $session->store( $locationId .'_token', $token );
+                        $session->store( $location->id .'_token', $token );
 
                         $messages[] = [
                             'message' => 'You have been added to the queue. Your queue position is ' . $position . '.',
@@ -92,25 +136,40 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']) ) {
 
                     } else {
 
-                        $token = $session->get( $locationId .'_token' );
+                        $token = $session->get( $location->id .'_token' );
                         $position = $location->getCurrentQueuePositionByToken($token);
 
-                        $messages[] = [
-                            'message' => 'You already have an active queue position. Your queue position is ' . $position . '.',
-                            'type' => 'error'
-                        ];
-                        $session->store('messages', $messages);
+                        if ( !$position ) {
+                            $session->remove( $location->id .'_token' );
+
+                            $messages[] = [
+                                'message' => 'Your token has expired. Please try again.',
+                                'type' => 'danger'
+                            ];
+                            $session->store('messages', $messages);
+
+                        } else {
+
+                            $messages[] = [
+                                'message' => 'You already have an active queue position. Your queue position is ' . $position,
+                                'type' => 'danger'
+                            ];
+                            $session->store('messages', $messages);
+                        
+                        }
 
                     }
 
-                    redirect('index.php?location_id=' . $location_id );
+                    redirect('index.php?location_id=' . $location->id );
 
                 } catch( Exception $e ) {
 
+                    echo $e->getLine() . ' :: ' . $e->getMessage();
+
                     $messages = $session->get('messages');
                     $messages[] = [
-                        'message' => 'We were unable to find the location you specified.',
-                        'type' => 'success'
+                        'message' => 'We were unable to add you to the queue. An error has occurred.',
+                        'type' => 'danger'
                     ];
                     $session->store('messages', $messages);
 
@@ -142,7 +201,7 @@ function getLoggedInUserId() {
 }
 
 function getUser() {
-
+    
     if ( isLoggedIn() ) {
         $userId = getLoggedInUserId();
 

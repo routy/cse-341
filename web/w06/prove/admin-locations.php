@@ -24,6 +24,7 @@ $locations  = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 if( $locations && count($locations) > 0 ) : ?>
 
+    <!-- <a href="<?php echo path('admin-locations.php?form=add_new_location'); ?>" class="btn btn-success mb-3">Add New Location</a> -->
     <table class="table">
         <thead class="thead-dark">
             <tr>

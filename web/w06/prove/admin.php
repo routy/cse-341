@@ -13,12 +13,11 @@ require_once('templates/admin-header.php'); ?>
           <div class="card mb-4 shadow-sm">
             <div class="card-body">
                 <h3>Locations</h3>
-              <p class="card-text">Manage your locations and toggle queue availability for your customers.</p>
+              <p class="card-text">Manage your locations and toggle queue position for your customers.</p>
               <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group">
                   <a href="<?php echo path('admin-locations.php'); ?>" class="btn btn-sm btn-outline-secondary">Manage Locations</a>
                 </div>
-                <small class="text-muted">Total Locations: ##</small>
               </div>
             </div>
           </div>

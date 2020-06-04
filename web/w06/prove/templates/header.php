@@ -19,7 +19,7 @@ $user = getUser();
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="css/styles.css"/>
+    <link rel="stylesheet" href="<?php echo path('css/styles.css'); ?>"/>
 
     <title>QueueMe - Locations</title>
 
@@ -52,7 +52,7 @@ $user = getUser();
 
             foreach( $messages as $message ) : ?>
 
-                <div class="alert alert-<?php echo $message['type']; ?>" role="alert">
+                <div class="alert alert-<?php echo $message['type']; ?> mt-3" role="alert">
                     <?php echo $message['message']; ?>
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
