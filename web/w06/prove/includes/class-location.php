@@ -252,7 +252,7 @@ class Location {
             $db->beginTransaction();
 
             $query = 'UPDATE queue_items SET queue_position = queue_position - 1
-                    WHERE status_id = ? AND queue_id = ?';
+                      WHERE status_id = ? AND queue_id = ?';
 
             $params = [self::STATUS_PENDING, $this->queueId];
 
@@ -260,7 +260,7 @@ class Location {
             $result    = $statement->execute($params);
 
             $query = 'UPDATE queue_items SET status_id = ?
-                    WHERE status_id = ? AND queue_id = ?';
+                      WHERE status_id = ? AND queue_id = ?';
 
             $params = [self::STATUS_COMPLETED, self::STATUS_ACTIVE, $this->queueId];
 
@@ -268,7 +268,7 @@ class Location {
             $result    = $statement->execute($params);
 
             $query = 'UPDATE queue_items SET status_id = ?
-                    WHERE id = (
+                      WHERE id = (
                         SELECT id 
                         FROM queue_items 
                         WHERE queue_id = ? AND status_id = ?

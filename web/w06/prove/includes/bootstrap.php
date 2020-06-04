@@ -20,19 +20,43 @@ if (isset($_REQUEST['action']) && !empty($_REQUEST['action']) ) {
 
     switch ($_REQUEST['action']){
 
-        case 'login':
+        case 'progress_queue':
 
-        break;
+            $userId = getLoggedInUserId();
 
-        case 'logout':
+            // Check if the user is allowed to progress the queue
+            if ( isset( $_REQUEST['location_id'] ) && is_numeric( $_REQUEST['location_id'] ) ) {
 
-        break;
+                $locationId = $_REQUEST['location_id'];
 
-        case 'register':
+                $messages = $session->get('messages');
 
-        break;
+                try {
 
-        case 'next_in_queue':
+                    $location = new Location( $locationId );
+                    
+                    if ( $location->isUserLocationAdmin($userId) ) {
+
+                        $location->setNextInQueueActive();
+
+                        $messages[] = [
+                            'message' => 'Queue has advanced to the next user.',
+                            'type' => 'success'
+                        ];
+                        $session->store('messages', $messages);
+
+                    }
+
+                } catch (Exception $e) {
+
+                    $messages[] = [
+                        'message' => 'You are not allowed to progress the queue for this location.',
+                        'type' => 'danger'
+                    ];
+                    $session->store('messages', $messages);
+
+                }
+            }
 
         break;
 
@@ -118,7 +142,7 @@ function getLoggedInUserId() {
 }
 
 function getUser() {
-    
+
     if ( isLoggedIn() ) {
         $userId = getLoggedInUserId();
 

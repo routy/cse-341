@@ -60,7 +60,7 @@ if ( $user ) {
       </div>
       <div class="col-md-4">
         <h2>Currently Waiting</h2>
-        <p><?php echo $location->getCurrentQueuePosition(); ?></p>
+        <p><?php echo $location->getQueueItemCountByStatus(); ?></p>
       </div>
       <div class="col-md-4">
         <h2>Est. Wait Time</h2>
