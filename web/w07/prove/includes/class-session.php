@@ -6,7 +6,6 @@ if (!defined('BOOTSTRAPPED')) {
 
 class Session
 {
-
     /**
      * Instance of the Session
      */

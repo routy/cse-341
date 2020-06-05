@@ -56,7 +56,7 @@ $locations  = $statement->fetchAll(PDO::FETCH_COLUMN);
                         <?php echo $location->getFormattedAddress(); ?>
                     </div>
 
-                    <a href="<?php echo path('?location_id=' . $location->id); ?>"
+                    <a href="<?php echo url('?location_id=' . $location->id); ?>"
                             class="btn btn-lg btn-block btn-outline-primary">
                         View Location
                     </a>

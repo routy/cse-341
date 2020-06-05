@@ -1,8 +1,8 @@
 <?php
 
-require_once('includes/bootstrap.php');
+require_once( dirname(__FILE__) . '/includes/bootstrap.php');
 
-require_once('templates/admin-header.php'); ?>
+require_once( TEMPLATE_PATH . 'admin/admin-header.php'); ?>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Dashboard</h1>
@@ -16,7 +16,7 @@ require_once('templates/admin-header.php'); ?>
               <p class="card-text">Manage your locations and toggle queue position for your customers.</p>
               <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group">
-                  <a href="<?php echo path('admin-locations.php'); ?>" class="btn btn-sm btn-outline-secondary">Manage Locations</a>
+                  <a href="<?php echo url('admin-locations.php'); ?>" class="btn btn-sm btn-outline-secondary">Manage Locations</a>
                 </div>
               </div>
             </div>
@@ -24,4 +24,4 @@ require_once('templates/admin-header.php'); ?>
         </div>
       </div>
 
-<?php require_once('templates/admin-footer.php'); ?>
+<?php require_once( TEMPLATE_PATH . 'admin/admin-footer.php'); ?>

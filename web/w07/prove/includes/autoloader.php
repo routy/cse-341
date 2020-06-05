@@ -5,6 +5,6 @@ if (!defined('BOOTSTRAPPED')) {
 }
 
 spl_autoload_register( function( $class ) {
-    $file = 'class-' . strtolower($class) . '.php';
-    require_once( $file );
+    $file = 'class-' . str_replace( '_', '-', strtolower( $class ) ) . '.php';
+    require_once( INCLUDE_PATH . $file );
 });

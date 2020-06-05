@@ -1,8 +1,8 @@
 <?php
 
-require_once('includes/bootstrap.php');
+require_once( dirname(__FILE__) . '/includes/bootstrap.php');
 
-require_once('templates/admin-header.php'); ?>
+require_once( TEMPLATE_PATH . 'admin/admin-header.php'); ?>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Locations</h1>
@@ -17,14 +17,14 @@ $query  = "SELECT l.id
            INNER JOIN location_user lu 
             ON (l.id = lu.location_id AND lu.user_id = ?)";
 
-$params     = [ getLoggedInUserId() ];
+$params     = [ User::getCurrentUserId() ];
 $statement  = $db->prepare($query);
 $result     = $statement->execute($params);
 $locations  = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 if( $locations && count($locations) > 0 ) : ?>
 
-    <!-- <a href="<?php echo path('admin-locations.php?form=add_new_location'); ?>" class="btn btn-success mb-3">Add New Location</a> -->
+    <a href="<?php echo url('admin-locations.php?form=add_new_location'); ?>" class="btn btn-success mb-3">Add New Location</a>
     <table class="table">
         <thead class="thead-dark">
             <tr>
@@ -54,7 +54,7 @@ if( $locations && count($locations) > 0 ) : ?>
             <th><?php echo $location->getFormattedStatus(); ?></th>
             <td><?php echo $location->getQueueItemCountByStatus(); ?></td>
             <td><?php echo $location->getEstimatedWaitTime( $format = 'minutes' ); ?> mins</td>
-            <td><a href="<?php echo path('index.php?location_id=' . $location->id) ?>" class="btn btn-sm btn-outline-primary">View Location</a></td>
+            <td><a href="<?php echo url('index.php?location_id=' . $location->id) ?>" class="btn btn-sm btn-outline-primary">View Location</a></td>
             </tr>
             
         <?php endforeach; ?>
@@ -68,4 +68,4 @@ if( $locations && count($locations) > 0 ) : ?>
 
 <?php endif; ?>
 
-<?php require_once('templates/admin-footer.php'); ?>
+<?php require_once( TEMPLATE_PATH . 'admin/admin-footer.php'); ?>

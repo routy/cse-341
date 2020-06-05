@@ -6,17 +6,12 @@ try {
     $location = new Location( $location_id );
 } catch ( Exception $e) {
 
-    $messages = $session->get('messages');
-    $messages[] = [
-        'message' => 'The location you requested was not found.',
-        'type' => 'error'
-    ];
-    $session->store('messages', $messages);
+  Message::add('The location you requested was not found.', 'danger');
 
-    redirect('index.php');
+  redirect('index.php');
 }
 
-$user     = getUser();
+$user     = User::getCurrentUser();
 $isAdmin  = false;
 $position = false;
 
@@ -24,7 +19,7 @@ if ( $user ) {
   $isAdmin  = $location->isUserLocationAdmin($user['id']);
 }
 
-$token = $session->get( $location->id . '_token');
+$token = User::getSessionLocationToken($location->id);
 
 if ( $token ) {
   $position = $location->getCurrentQueuePositionByToken($token); 
@@ -41,13 +36,13 @@ if ( $token ) {
       
       <?php if ($isAdmin) : ?>
         <p>
-        <a href="<?php echo path('?location_id=' . $location->id . '&action=next_in_queue'); ?>" class="btn btn-lg btn-primary">
+        <a href="<?php echo url('?location_id=' . $location->id . '&action=next_in_queue'); ?>" class="btn btn-lg btn-primary">
             Serve Next In Queue &raquo;
         </a>
       </p>
       <?php elseif ( !$position ) : ?>
       <p>
-        <a href="<?php echo path('?location_id=' . $location->id . '&action=add_item_to_queue'); ?>" class="btn btn-lg btn-primary">
+        <a href="<?php echo url('?location_id=' . $location->id . '&action=add_item_to_queue'); ?>" class="btn btn-lg btn-primary">
             Enter Queue &raquo;
         </a>
       </p>
@@ -64,11 +59,7 @@ if ( $token ) {
         <?php echo $location->getFormattedAddress(); ?>
       </div>
       <div class="col-md-4">
-<<<<<<< HEAD
         <h2>Currently Waiting</h2>
-=======
-        <h3>Total Waiting</h3>
->>>>>>> 52a45365ba82e1e71e5b4b0852f18722c8ebb573
         <p><?php echo $location->getQueueItemCountByStatus(); ?></p>
       </div>
       <div class="col-md-4">
